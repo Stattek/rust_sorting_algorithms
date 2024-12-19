@@ -29,7 +29,7 @@ mod tests {
         let test: Vec<i32> = vec![];
         assert_eq!(test, list);
 
-        // descending sort
+        // descending order sort
         let mut list: Vec<i32> = vec![4, 5, 2, 1, 3];
         insertion_sort(&mut list, |num1, num2| -> bool { num1 > num2 });
         assert_eq!(vec![5, 4, 3, 2, 1], list);
