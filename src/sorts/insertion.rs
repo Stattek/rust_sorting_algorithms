@@ -13,17 +13,17 @@ use std::mem::swap;
 /// // create a list of elements
 /// let mut list = vec![4,5,2,1,3];
 /// // sort using a closure to sort elements in ascending order
-/// insertion_sort(&mut list, |num1, num2| -> bool { num1 < num2 });
+/// insertion_sort(&mut list, |first, second| -> bool { first < second });
 /// assert_eq!(vec![1, 2, 3, 4, 5], list);
 ///
 /// ```
-pub fn insertion_sort<T, U>(list: &mut Vec<T>, comparison_closure: U)
+pub fn insertion_sort<T, U>(list: &mut Vec<T>, in_order: U)
 where
     U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
 {
     for i in 1..list.len() {
         for j in (1..=i).rev() {
-            if comparison_closure(&list[j], &list[j - 1]) {
+            if !in_order(&list[j - 1], &list[j]) {
                 // split the vector to be able to swap behind a mutable reference
                 let (first, second) = list.split_at_mut(j);
 
