@@ -35,7 +35,7 @@ where
         if i != element_to_add_idx {
             // swap the elements
             let (left, right) = list.split_at_mut(element_to_add_idx);
-            std::mem::swap(&mut left[i], &mut right[0]);
+            swap(&mut left[i], &mut right[0]);
         }
     }
 }
