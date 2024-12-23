@@ -116,6 +116,7 @@ fn merge_sort_test() {
     list = merge_sort_top_down(&list, &descending_sort_closure);
     assert_eq!(vec![5, 4, 3, 2, 1], list);
 
+    // since this algorithm is faster than the others, let's push it a little
     let mut list = generate_rand_vec(400000);
     list = merge_sort_top_down(&list, &ascending_sort_closure);
     is_sorted(&list, ascending_sort_closure);
