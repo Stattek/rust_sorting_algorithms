@@ -15,7 +15,7 @@ use std::mem::swap;
 /// // create a list of elements
 /// let mut list = vec![4,5,2,1,3];
 /// // sort using a closure to sort elements in ascending order
-/// bubble_sort(&mut list, |first, second| -> bool { first < second });
+/// bubble_sort(&mut list, |first, second| -> bool { first <= second });
 /// assert_eq!(vec![1, 2, 3, 4, 5], list);
 ///
 /// ```

@@ -1,13 +1,16 @@
 // ignoring unused import and dead code warnings for tests
 #![allow(unused_imports)]
 #![allow(dead_code)]
-use crate::{bubble_sort, insertion_sort, merge_sort_top_down, selection_sort};
+use crate::{
+    bubble_sort, insertion_sort, merge_sort_top_down, selection_sort,
+    sorts::merge::merge_sort_top_down_multithread,
+};
 use rand::Rng;
 
 #[test]
 fn insertion_sort_test() {
-    let ascending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 < num2 };
-    let descending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 > num2 };
+    let ascending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 <= num2 };
+    let descending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 >= num2 };
     // create a list of elements
     let mut list = vec![4, 5, 2, 1, 3];
     // sort using a closure to sort elements in ascending order
@@ -30,13 +33,13 @@ fn insertion_sort_test() {
 
     let mut list = generate_rand_vec(4000);
     insertion_sort(&mut list, ascending_sort_closure);
-    is_sorted(&list, ascending_sort_closure);
+    assert_eq!(true, is_sorted(&list, ascending_sort_closure));
 }
 
 #[test]
 fn bubble_sort_test() {
-    let ascending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 < num2 };
-    let descending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 > num2 };
+    let ascending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 <= num2 };
+    let descending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 >= num2 };
     // create a list of elements
     let mut list = vec![4, 5, 2, 1, 3];
     // sort using a closure to sort elements in ascending order
@@ -59,13 +62,13 @@ fn bubble_sort_test() {
 
     let mut list = generate_rand_vec(4000);
     bubble_sort(&mut list, ascending_sort_closure);
-    is_sorted(&list, ascending_sort_closure);
+    assert_eq!(true, is_sorted(&list, ascending_sort_closure));
 }
 
 #[test]
 fn selection_sort_test() {
-    let ascending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 < num2 };
-    let descending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 > num2 };
+    let ascending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 <= num2 };
+    let descending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 >= num2 };
     // create a list of elements
     let mut list = vec![4, 5, 2, 1, 3];
     // sort using a closure to sort elements in ascending order
@@ -88,13 +91,15 @@ fn selection_sort_test() {
 
     let mut list = generate_rand_vec(4000);
     selection_sort(&mut list, ascending_sort_closure);
-    is_sorted(&list, ascending_sort_closure);
+    assert_eq!(true, is_sorted(&list, ascending_sort_closure));
 }
 
 #[test]
 fn merge_sort_test() {
-    let ascending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 < num2 };
-    let descending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 > num2 };
+    // NOTE: to prevent the checks from failing upon some tests, doing `<=` or `>=` should be used
+    // in cases where there are more than one of the same number
+    let ascending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 <= num2 };
+    let descending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 >= num2 };
 
     // create a list of elements
     let mut list = vec![4, 5, 2, 1, 3];
@@ -119,11 +124,34 @@ fn merge_sort_test() {
     // since this algorithm is faster than the others, let's push it a little
     let mut list = generate_rand_vec(400000);
     list = merge_sort_top_down(&list, &ascending_sort_closure);
-    is_sorted(&list, ascending_sort_closure);
+    assert_eq!(true, is_sorted(&list, ascending_sort_closure));
+}
+
+#[test]
+fn merge_sort_multithreaded_test() {
+    let num_threads = 8; // This is the sweet spot on my machine that typically gets the best results
+    let list = generate_rand_vec(400000);
+    let closure = |num1: &i32, num2: &i32| -> bool { num1 <= num2 };
+
+    let merge_sort_result = merge_sort_top_down_multithread(
+        list,
+        // evil static closure
+        &|num1: &i32, num2: &i32| -> bool { num1 <= num2 },
+        num_threads,
+    );
+
+    match merge_sort_result {
+        Ok(merged_list) => {
+            assert_eq!(true, is_sorted(&merged_list, closure))
+        }
+        Err(err_val) => {
+            panic!("Error when doing multithreaded merge sort ({})", err_val);
+        }
+    }
 }
 
 /// Generates a random vector of `i32`s.
-fn generate_rand_vec(num_elements: u32) -> Vec<i32> {
+pub fn generate_rand_vec(num_elements: u32) -> Vec<i32> {
     let mut rng = rand::thread_rng();
     let mut output = vec![];
     for _ in 0..num_elements {
@@ -134,7 +162,7 @@ fn generate_rand_vec(num_elements: u32) -> Vec<i32> {
 }
 
 /// Checks to see if a vector is sorted.
-fn is_sorted<U, T>(list: &Vec<T>, in_order: U) -> bool
+pub fn is_sorted<U, T>(list: &Vec<T>, in_order: U) -> bool
 where
     U: Fn(&T, &T) -> bool,
 {

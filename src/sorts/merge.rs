@@ -1,10 +1,11 @@
 use std::thread;
 
-/// Performs an merge sort on a list of elements.
+/// Performs a merge sort on a list of elements.
 ///
 /// # Params
 /// - `list` - The `Vec<T>` to sort.
-/// - `in_order` - The closure to use to sort the array.
+/// - `in_order` - The closure to use to sort the array. Determines if its `first`
+/// argument comes before its `second` argument.
 ///
 /// # Returns
 /// - The sorted `Vec<T>`.
@@ -14,7 +15,7 @@ use std::thread;
 /// ```rust norun
 ///
 /// // sort using a closure to sort elements in ascending order
-/// let list = insertion_sort(&vec![4, 5, 2, 1, 3], &|first, second| -> bool { first < second });
+/// let list = insertion_sort(&vec![4, 5, 2, 1, 3], &|first, second| -> bool { first <= second });
 /// assert_eq!(vec![1, 2, 3, 4, 5], list);
 ///
 /// ```
@@ -32,7 +33,7 @@ where
     let left = merge_sort_top_down(&first.to_vec(), in_order);
     let right = merge_sort_top_down(&second.to_vec(), in_order);
 
-    merge(&left, &right, in_order)
+    merge_vecs(&left, &right, in_order)
 }
 
 /// Merges the elements from two different vectors into one vector, in the
@@ -45,7 +46,7 @@ where
 ///
 /// # Returns
 /// - The merged `Vec`.
-fn merge<T, U>(left: &Vec<T>, right: &Vec<T>, in_order: &U) -> Vec<T>
+pub fn merge_vecs<T, U>(left: &Vec<T>, right: &Vec<T>, in_order: &U) -> Vec<T>
 where
     T: Clone,
     U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
@@ -54,6 +55,47 @@ where
 
     // add all the elements to the resulting vec
     let mut indicies = vec![(0, left), (0, right)];
+    loop {
+        let element_to_add = find_next_element(&mut indicies, in_order);
+
+        match element_to_add {
+            None => {
+                // break from the loop and cause the resulting merged list to be returned
+                break;
+            }
+            Some(element) => {
+                merged.push(element);
+            }
+        }
+    }
+
+    merged
+}
+
+/// Merges the elements from one or more different vectors into one vector, in the
+/// proper sorting order.
+///
+/// # Params
+/// - `left` - The left `Vec` to merge.
+/// - `right` - The right `Vec` to merge.
+/// - `in_order` - The closure that determines if its `first` argument comes before its `second` argument.
+///
+/// # Returns
+/// - The merged `Vec`.
+#[allow(dead_code)]
+fn merge_multiple<T, U>(lists: &Vec<Vec<T>>, in_order: &U) -> Vec<T>
+where
+    T: Clone,
+    U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
+{
+    let mut merged = vec![];
+
+    let mut indicies = vec![];
+    // add all the elements to the resulting vec
+    for inner_list in lists {
+        indicies.push((0, inner_list));
+    }
+
     loop {
         let element_to_add = find_next_element(&mut indicies, in_order);
 
@@ -125,14 +167,15 @@ where
     output
 }
 
-#[cfg(target_os = "none")]
-pub fn merge_sort_top_down_multithread<'a, T>(
+// #[cfg(target_os = "none")]
+pub fn merge_sort_top_down_multithread<T, U>(
     list: Vec<T>,
-    in_order: Box<dyn Fn(&T, &T) -> bool + Send>,
+    in_order: &'static U,
     num_threads: u32,
 ) -> Result<Vec<T>, &'static str>
 where
-    T: Clone + Send + 'static, // we want to be able to clone the datatype held in the vector
+    T: Clone + Send + Sync + 'static, // we want to be able to clone the datatype held in the vector
+    U: Fn(&T, &T) -> bool + Sync + Send + Clone, // we want a closure to compare the two values and return a bool
 {
     if num_threads == 0 {
         return Err("Cannot perform a merge sort with no threads");
@@ -151,9 +194,21 @@ where
         };
 
         let new_list = list[start..end].to_vec();
-        handlers.push(thread::spawn(|| merge_sort_top_down(&new_list, &in_order)));
+        handlers.push(thread::spawn(move || {
+            merge_sort_top_down(&new_list, in_order)
+        }));
     }
-    let merged = vec![];
+
+    let mut merged = vec![];
+    for handler in handlers {
+        let result = handler.join();
+        match result {
+            Ok(the_vec) => merged = merge_vecs(&merged, &the_vec, in_order),
+            Err(_) => {
+                return Err("Error when joining thread in merge sort");
+            }
+        }
+    }
 
     Ok(merged)
 }
