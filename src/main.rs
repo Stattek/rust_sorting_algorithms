@@ -1,7 +1,7 @@
 mod sorts;
 mod tests;
 
-use sorts::{bubble::bubble_sort, insertion::insertion_sort};
+use sorts::{bubble::bubble_sort, insertion::insertion_sort, merge::merge_sort_top_down};
 
 fn main() {
     println!("Hello, world!");
@@ -22,4 +22,9 @@ fn main() {
     let mut list: Vec<u32> = vec![0, 5, 6, 32, 78, 43];
     bubble_sort(&mut list, |first, second| -> bool { first < second });
     println!("Bubble sort: {:?}", list);
+
+    // Merge sort
+    let mut list: Vec<u32> = vec![0, 5, 6, 32, 78, 43];
+    list = merge_sort_top_down(&list, &|first, second| -> bool { first < second });
+    println!("Merge sort: {:?}", list);
 }
