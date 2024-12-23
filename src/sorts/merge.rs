@@ -1,8 +1,11 @@
 /// Performs an merge sort on a list of elements.
 ///
 /// # Params
-/// - `list` - The `Vec` to sort.
-/// - `comparison_closure` - The closure to use to sort the array.
+/// - `list` - The `Vec<T>` to sort.
+/// - `in_order` - The closure to use to sort the array.
+///
+/// # Returns
+/// - The sorted `Vec<T>`.
 ///
 /// # Example
 ///
@@ -18,7 +21,15 @@ where
     T: Clone,              // we want to be able to clone the datatype held in the vector
     U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
 {
-    /// Finds the element to add (such as a minimum or maximum) value from a `Vec` of `Vec`s
+    /// Finds the element to add (such as a minimum or maximum) value from a `Vec` of `Vec`s.
+    ///
+    /// # Params
+    /// - `indices` - A `Vec` of tuples, containing the (current index, list for that index). Keeps track of
+    /// the current index into that `Vec` and also the `Vec` itself.
+    /// - `in_order` - The closure that determines if its `first` argument comes before its `second` argument.
+    ///
+    /// # Returns
+    /// - `Some(T)` when successfully finding the next element or `None` upon failure.
     fn find_next_element<T, U>(indices: &mut Vec<(usize, &Vec<T>)>, in_order: &U) -> Option<T>
     where
         T: Clone,
@@ -64,6 +75,16 @@ where
         output
     }
 
+    /// Merges the elements from two different vectors into one vector, in the
+    /// proper sorting order.
+    ///
+    /// # Params
+    /// - `left` - The left `Vec` to merge.
+    /// - `right` - The right `Vec` to merge.
+    /// - `in_order` - The closure that determines if its `first` argument comes before its `second` argument.
+    ///
+    /// # Returns
+    /// - The merged `Vec`.
     fn merge<T, U>(left: &Vec<T>, right: &Vec<T>, in_order: &U) -> Vec<T>
     where
         T: Clone,
