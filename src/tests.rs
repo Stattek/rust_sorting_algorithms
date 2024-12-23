@@ -1,9 +1,7 @@
 // ignoring unused import and dead code warnings for tests
 #![allow(unused_imports)]
 #![allow(dead_code)]
-use crate::bubble_sort;
-use crate::insertion_sort;
-use crate::merge_sort_top_down;
+use crate::{bubble_sort, insertion_sort, merge_sort_top_down, selection_sort};
 use rand::Rng;
 
 #[test]
@@ -61,6 +59,35 @@ fn bubble_sort_test() {
 
     let mut list = generate_rand_vec(4000);
     bubble_sort(&mut list, ascending_sort_closure);
+    is_sorted(&list, ascending_sort_closure);
+}
+
+#[test]
+fn selection_sort_test() {
+    let ascending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 < num2 };
+    let descending_sort_closure = |num1: &i32, num2: &i32| -> bool { num1 > num2 };
+    // create a list of elements
+    let mut list = vec![4, 5, 2, 1, 3];
+    // sort using a closure to sort elements in ascending order
+    selection_sort(&mut list, ascending_sort_closure);
+    assert_eq!(vec![1, 2, 3, 4, 5], list);
+
+    let mut list: Vec<i32> = vec![];
+    selection_sort(&mut list, ascending_sort_closure);
+    let test: Vec<i32> = vec![];
+    assert_eq!(test, list);
+
+    let mut list: Vec<i32> = vec![1];
+    selection_sort(&mut list, ascending_sort_closure);
+    assert_eq!(vec![1], list);
+
+    // descending order sort
+    let mut list: Vec<i32> = vec![4, 5, 2, 1, 3];
+    selection_sort(&mut list, descending_sort_closure);
+    assert_eq!(vec![5, 4, 3, 2, 1], list);
+
+    let mut list = generate_rand_vec(4000);
+    selection_sort(&mut list, ascending_sort_closure);
     is_sorted(&list, ascending_sort_closure);
 }
 
