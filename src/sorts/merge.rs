@@ -83,7 +83,7 @@ where
 /// # Returns
 /// - The merged `Vec`.
 #[allow(dead_code)]
-fn merge_multiple<T, U>(lists: &Vec<Vec<T>>, in_order: &U) -> Vec<T>
+pub fn merge_multiple<T, U>(lists: &Vec<Vec<T>>, in_order: &U) -> Vec<T>
 where
     T: Clone,
     U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
