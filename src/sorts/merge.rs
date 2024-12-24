@@ -46,7 +46,7 @@ where
 ///
 /// # Returns
 /// - The merged `Vec`.
-pub fn merge_vecs<T, U>(left: &Vec<T>, right: &Vec<T>, in_order: &U) -> Vec<T>
+fn merge_vecs<T, U>(left: &Vec<T>, right: &Vec<T>, in_order: &U) -> Vec<T>
 where
     T: Clone,
     U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
@@ -83,7 +83,7 @@ where
 /// # Returns
 /// - The merged `Vec`.
 #[allow(dead_code)]
-pub fn merge_multiple<T, U>(lists: &Vec<Vec<T>>, in_order: &U) -> Vec<T>
+fn merge_multiple<T, U>(lists: &Vec<Vec<T>>, in_order: &U) -> Vec<T>
 where
     T: Clone,
     U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
