@@ -167,7 +167,6 @@ where
     output
 }
 
-// #[cfg(target_os = "none")]
 pub fn merge_sort_top_down_multithread<T, U>(
     list: Vec<T>,
     in_order: &'static U,
