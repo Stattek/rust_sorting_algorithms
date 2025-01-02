@@ -1,5 +1,3 @@
-use std::{fmt::Debug, mem::swap};
-
 /// Struct to represent a Heap with generics, as it will not always be possible to
 /// save the size as the first element in the vector, due to what may be stored in
 /// it (could be something that isn't a number).
