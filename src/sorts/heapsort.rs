@@ -38,7 +38,7 @@ where
 /// ```
 pub fn heap_sort<T, U>(list: Vec<T>, in_order: &Box<U>) -> Vec<T>
 where
-    T: Clone + Debug,      // we want to be able to clone the datatype held in the vector
+    T: Clone,              // we want to be able to clone the datatype held in the vector
     U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
 {
     let mut the_heap = Heap::new(list);
