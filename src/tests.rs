@@ -1,9 +1,11 @@
 // ignoring unused import and dead code warnings for tests
 #![allow(unused_imports)]
 #![allow(dead_code)]
+use std::fmt::Debug;
+
 use crate::{
     bubble_sort, insertion_sort, merge_sort_top_down, selection_sort,
-    sorts::merge::merge_sort_top_down_multithread,
+    sorts::{mergesort::merge_sort_top_down_multithread, quicksort::quick_sort},
 };
 use rand::Rng;
 
@@ -161,15 +163,57 @@ pub fn generate_rand_vec(num_elements: u32) -> Vec<i32> {
     output
 }
 
+#[test]
+fn quick_sort_test() {
+    let ascending_sort_closure = Box::new(|num1: &i32, num2: &i32| -> bool { num1 < num2 });
+    let ascending_is_eq_closure = Box::new(|num1: &i32, num2: &i32| -> bool { num1 <= num2 });
+    let descending_sort_closure = Box::new(|num1: &i32, num2: &i32| -> bool { num1 > num2 });
+    let descending_is_eq_closure = Box::new(|num1: &i32, num2: &i32| -> bool { num1 >= num2 });
+
+    // create a list of elements
+    let mut list = vec![4, 5, 2, 1, 3];
+    // sort using a closure to sort elements in ascending order
+    list = quick_sort(list, &ascending_sort_closure);
+    assert_eq!(vec![1, 2, 3, 4, 5], list);
+
+    let mut list: Vec<i32> = vec![];
+    list = quick_sort(list, &ascending_sort_closure);
+    let test: Vec<i32> = vec![];
+    assert_eq!(test, list);
+
+    let mut list: Vec<i32> = vec![1];
+    list = quick_sort(list, &ascending_sort_closure);
+    assert_eq!(vec![1], list);
+
+    // descending order sort
+    let mut list: Vec<i32> = vec![4, 5, 2, 1, 3];
+    list = quick_sort(list, &descending_sort_closure);
+    assert_eq!(vec![5, 4, 3, 2, 1], list);
+
+    let mut list = generate_rand_vec(40000);
+    list = quick_sort(list, &ascending_sort_closure);
+    assert_eq!(true, is_sorted(&list, &ascending_is_eq_closure));
+
+    let mut list = generate_rand_vec(40000);
+    list = quick_sort(list, &descending_sort_closure);
+    assert_eq!(true, is_sorted(&list, &descending_is_eq_closure));
+}
+
 /// Checks to see if a vector is sorted.
 pub fn is_sorted<U, T>(list: &Vec<T>, in_order: U) -> bool
 where
+    T: Debug,
     U: Fn(&T, &T) -> bool,
 {
     let mut output = true;
     for i in 1..list.len() {
         if !in_order(&list[i - 1], &list[i]) {
             output = false;
+            println!(
+                "ERROR: Element {:?} should not come before element {:?}",
+                list[i - 1],
+                list[i]
+            );
             break;
         }
     }

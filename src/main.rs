@@ -4,10 +4,11 @@ mod tests;
 use std::time::Instant;
 
 use sorts::{
-    bubble::bubble_sort,
-    insertion::insertion_sort,
-    merge::{merge_sort_top_down, merge_sort_top_down_multithread},
-    selection::selection_sort,
+    bubblesort::bubble_sort,
+    insertionsort::insertion_sort,
+    mergesort::{merge_sort_top_down, merge_sort_top_down_multithread},
+    quicksort::quick_sort,
+    selectionsort::selection_sort,
 };
 use tests::{generate_rand_vec, is_sorted};
 
@@ -66,4 +67,15 @@ fn main() {
             panic!("Error when doing multithreaded merge sort ({})", err_val);
         }
     }
+
+    // quicksort
+    let mut list = generate_rand_vec(400000);
+    let closure = Box::new(|num1: &i32, num2: &i32| -> bool { num1 < num2 });
+    list = quick_sort(list, &closure);
+    // check that this is correct
+    assert_eq!(
+        true,
+        is_sorted(&list, |num1: &i32, num2: &i32| -> bool { num1 <= num2 })
+    );
+    println!("Quicksort successful.");
 }
