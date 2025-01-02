@@ -23,7 +23,7 @@ use crate::sorts::insertionsort::insertion_sort;
 /// // sort using a closure to sort elements in ascending order
 /// // NOTE: avoid using <= or >=, as this sort doesn't work properly with those comparisons.
 /// let mut list = vec![4, 5, 2, 1, 3];
-/// list = quick_sort(list, Box::new(|num1: &i32, num2: &i32| -> bool { num1 < num2 }));
+/// list = quick_sort(list, &Box::new(|num1: &i32, num2: &i32| -> bool { num1 < num2 }));
 /// assert_eq!(vec![1, 2, 3, 4, 5], list);
 ///
 /// ```
