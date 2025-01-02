@@ -3,3 +3,4 @@ pub mod insertionsort;
 pub mod mergesort;
 pub mod selectionsort;
 pub mod quicksort;
+pub mod heapsort;

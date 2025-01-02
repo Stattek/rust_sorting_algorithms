@@ -5,6 +5,7 @@ use std::time::Instant;
 
 use sorts::{
     bubblesort::bubble_sort,
+    heapsort::heap_sort,
     insertionsort::insertion_sort,
     mergesort::{merge_sort_top_down, merge_sort_top_down_multithread},
     quicksort::quick_sort,
@@ -78,4 +79,18 @@ fn main() {
         is_sorted(&list, |num1: &i32, num2: &i32| -> bool { num1 <= num2 })
     );
     println!("Quicksort successful.");
+
+    // heapsort
+    let mut list = vec![9, 2, 7, 8, 4, 5, 3, 1, 6, 10];
+    let closure = Box::new(|num1: &i32, num2: &i32| -> bool { num1 < num2 });
+    list = heap_sort(list, &closure);
+    // check that this is correct
+    assert_eq!(
+        true,
+        is_sorted(
+            &vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            |num1: &i32, num2: &i32| -> bool { num1 <= num2 }
+        )
+    );
+    println!("Heapsort successful: {:?}", list);
 }

@@ -5,9 +5,14 @@ use std::fmt::Debug;
 
 use crate::{
     bubble_sort, insertion_sort, merge_sort_top_down, selection_sort,
-    sorts::{mergesort::merge_sort_top_down_multithread, quicksort::quick_sort},
+    sorts::{
+        heapsort::heap_sort, mergesort::merge_sort_top_down_multithread, quicksort::quick_sort,
+    },
 };
 use rand::Rng;
+
+static BASIC_SORT_RAND_VEC_LEN: u32 = 4000;
+static ADVANCED_SORT_RAND_VEC_LEN: u32 = 40000;
 
 #[test]
 fn insertion_sort_test() {
@@ -33,7 +38,7 @@ fn insertion_sort_test() {
     insertion_sort(&mut list, descending_sort_closure);
     assert_eq!(vec![5, 4, 3, 2, 1], list);
 
-    let mut list = generate_rand_vec(4000);
+    let mut list = generate_rand_vec(BASIC_SORT_RAND_VEC_LEN);
     insertion_sort(&mut list, ascending_sort_closure);
     assert_eq!(true, is_sorted(&list, ascending_sort_closure));
 }
@@ -62,7 +67,7 @@ fn bubble_sort_test() {
     bubble_sort(&mut list, descending_sort_closure);
     assert_eq!(vec![5, 4, 3, 2, 1], list);
 
-    let mut list = generate_rand_vec(4000);
+    let mut list = generate_rand_vec(BASIC_SORT_RAND_VEC_LEN);
     bubble_sort(&mut list, ascending_sort_closure);
     assert_eq!(true, is_sorted(&list, ascending_sort_closure));
 }
@@ -91,7 +96,7 @@ fn selection_sort_test() {
     selection_sort(&mut list, descending_sort_closure);
     assert_eq!(vec![5, 4, 3, 2, 1], list);
 
-    let mut list = generate_rand_vec(4000);
+    let mut list = generate_rand_vec(BASIC_SORT_RAND_VEC_LEN);
     selection_sort(&mut list, ascending_sort_closure);
     assert_eq!(true, is_sorted(&list, ascending_sort_closure));
 }
@@ -124,7 +129,7 @@ fn merge_sort_test() {
     assert_eq!(vec![5, 4, 3, 2, 1], list);
 
     // since this algorithm is faster than the others, let's push it a little
-    let mut list = generate_rand_vec(400000);
+    let mut list = generate_rand_vec(ADVANCED_SORT_RAND_VEC_LEN);
     list = merge_sort_top_down(&list, &ascending_sort_closure);
     assert_eq!(true, is_sorted(&list, ascending_sort_closure));
 }
@@ -190,12 +195,48 @@ fn quick_sort_test() {
     list = quick_sort(list, &descending_sort_closure);
     assert_eq!(vec![5, 4, 3, 2, 1], list);
 
-    let mut list = generate_rand_vec(40000);
+    let mut list = generate_rand_vec(ADVANCED_SORT_RAND_VEC_LEN);
     list = quick_sort(list, &ascending_sort_closure);
     assert_eq!(true, is_sorted(&list, &ascending_is_eq_closure));
 
-    let mut list = generate_rand_vec(40000);
+    let mut list = generate_rand_vec(ADVANCED_SORT_RAND_VEC_LEN);
     list = quick_sort(list, &descending_sort_closure);
+    assert_eq!(true, is_sorted(&list, &descending_is_eq_closure));
+}
+
+#[test]
+fn heap_sort_test() {
+    let ascending_sort_closure = Box::new(|num1: &i32, num2: &i32| -> bool { num1 < num2 });
+    let ascending_is_eq_closure = Box::new(|num1: &i32, num2: &i32| -> bool { num1 <= num2 });
+    let descending_sort_closure = Box::new(|num1: &i32, num2: &i32| -> bool { num1 > num2 });
+    let descending_is_eq_closure = Box::new(|num1: &i32, num2: &i32| -> bool { num1 >= num2 });
+
+    // create a list of elements
+    let mut list = vec![4, 5, 2, 1, 3];
+    // sort using a closure to sort elements in ascending order
+    list = heap_sort(list, &ascending_sort_closure);
+    assert_eq!(vec![1, 2, 3, 4, 5], list);
+
+    let mut list: Vec<i32> = vec![];
+    list = heap_sort(list, &ascending_sort_closure);
+    let test: Vec<i32> = vec![];
+    assert_eq!(test, list);
+
+    let mut list: Vec<i32> = vec![1];
+    list = heap_sort(list, &ascending_sort_closure);
+    assert_eq!(vec![1], list);
+
+    // descending order sort
+    let mut list: Vec<i32> = vec![4, 5, 2, 1, 3];
+    list = heap_sort(list, &descending_sort_closure);
+    assert_eq!(vec![5, 4, 3, 2, 1], list);
+
+    let mut list = generate_rand_vec(ADVANCED_SORT_RAND_VEC_LEN);
+    list = heap_sort(list, &ascending_sort_closure);
+    assert_eq!(true, is_sorted(&list, &ascending_is_eq_closure));
+
+    let mut list = generate_rand_vec(ADVANCED_SORT_RAND_VEC_LEN);
+    list = heap_sort(list, &descending_sort_closure);
     assert_eq!(true, is_sorted(&list, &descending_is_eq_closure));
 }
 
