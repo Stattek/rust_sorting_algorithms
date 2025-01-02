@@ -48,6 +48,9 @@ where
 /// # Notes
 /// - Avoid using `<=` or `>=`, as this sort doesn't work properly with those comparisons.
 /// - Stick to using `<` and `>` for comparing elements.
+/// - This implementation could be made better, if I knew how to share multiple mutable references
+/// to modify the list rather than copying parts of it to subsequent recursive calls (Is this possible in unsafe Rust?).
+/// This means that this algorithm could likely be made better in terms of memory management. It's still fast, though.
 fn quick_sort_recursive<T, U>(mut list: Vec<T>, in_order: &Box<U>) -> Vec<T>
 where
     T: Clone,              // we want to be able to clone the datatype held in the vector
