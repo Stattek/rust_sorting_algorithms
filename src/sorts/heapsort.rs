@@ -43,17 +43,21 @@ where
     the_heap.heapify(in_order);
 
     for _ in (1..=the_heap.size).rev() {
-        the_heap.delete_max(in_order);
+        the_heap.delete_max_or_min(in_order);
     }
 
     the_heap.obtain_sorted_list()
 }
 
-// TODO: documentation on all these functions
 impl<T> Heap<T>
 where
     T: Clone,
 {
+    /// Creates a new `Heap` from a list of `T`, inserting a `None`
+    /// at the beginning to make math easier.
+    ///
+    /// # Params
+    /// - `list` - The `Vec` of `T` to create a `Heap` from.
     pub fn new(list: Vec<T>) -> Self {
         let list_size = list.len();
         // new list starting with `None` to make math easier when performing operations on the vector
@@ -68,6 +72,10 @@ where
         }
     }
 
+    /// Heapifies the `Heap` list, ordering the heap as a min/max heap.
+    ///
+    /// # Params
+    /// - `in_order` - The boxed closure to sort the heap with.
     pub fn heapify<U>(&mut self, in_order: &Box<U>)
     where
         U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
@@ -80,6 +88,11 @@ where
         }
     }
 
+    /// Performs a percolate down on the heap from the parent index.
+    ///
+    /// # Params
+    /// - `parent_idx` - The parent index to percolate down from.
+    /// - `in_order` - The boxed closure to sort the heap with.
     fn percolate_down<U>(&mut self, mut parent_idx: usize, in_order: &Box<U>)
     where
         U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
@@ -119,7 +132,12 @@ where
         }
     }
 
-    fn delete_max<U>(&mut self, in_order: &Box<U>)
+    /// Deletes the max/min element in the heap, adding it at the end of the heap
+    /// and decreasing the size of the heap.
+    ///
+    /// # Params
+    /// - `in_order` - The boxed closure to sort the heap with.
+    fn delete_max_or_min<U>(&mut self, in_order: &Box<U>)
     where
         U: Fn(&T, &T) -> bool, // we want a closure to compare the two values and return a bool
     {
@@ -133,6 +151,11 @@ where
         self.percolate_down(1, in_order);
     }
 
+    /// Obtains a sorted list from the `Heap` data, converting the
+    /// `Vec<Option<T>>` back to a `Vec<T>`.
+    ///
+    /// # Returns
+    /// - The sorted list.
     fn obtain_sorted_list(self) -> Vec<T> {
         let mut output_list = vec![];
 
